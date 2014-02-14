@@ -4,7 +4,7 @@ This style guide outlines the coding conventions of the iOS team at Redbooth Inc
 
 ## Introduction
 
-Here are some of the documents from Apple that informed the style guide. If something isn't mentioned here, it's probably covered in great detail in one of these:
+Here are some of the documents from Apple that informed the style guide. If something isn't mentioned here, it's probably covered in great detail in one of thesee:
 
 * [The Objective-C Programming Language](http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjectiveC/Introduction/introObjectiveC.html)
 * [Cocoa Fundamentals Guide](https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CocoaFundamentals/Introduction/Introduction.html)
@@ -51,7 +51,7 @@ UIApplication.sharedApplication.delegate;
 
 ## Spacing
 
-* Indent using 4 spaces. Never indent with tabs. Be sure to set this preference in Xcode.
+* Indent using tabs, not spaces.
 * Method braces always open and close on a new line.
 * Other braces (`if`/`else`/`switch`/`while` etc.) always open on the same line as the statement but close on a new line.
 
@@ -72,9 +72,19 @@ else {
 * There should be exactly one blank line between methods to aid in visual clarity and organization. Whitespace within methods should separate functionality, but often there should probably be new methods.
 * `@synthesize` and `@dynamic` should each be declared on new lines in the implementation.
 
-## Conditionals
+## Declarations
+* Instance variables should be prefixed with an underscore (just like when implicitly synthesized).
+* Don't put a space between an object type and the protocol it conforms to.
+* Don't use `@synthesize` unless the compiler requires it. Note that optional properties in protocols must be explicitly synthesized in order to exist.
+* Don't access an ivar unless you're in `-init`, `-dealloc` or a custom accessor (lazy instantiation).
+
+
+## Control Structures
 
 Conditional bodies should always use braces even when a conditional body could be written without braces (e.g., it is one line only) to prevent [errors](https://github.com/NYTimes/objective-c-style-guide/issues/26#issuecomment-22074256). These errors include adding a second line and expecting it to be part of the if-statement. Another, [even more dangerous defect](http://programmers.stackexchange.com/a/16530) may happen where the line "inside" the if-statement is commented out, and the next line unwittingly becomes part of the if-statement. In addition, this style is more consistent with all other conditionals, and therefore more easily scannable.
+
+* Put a single space after keywords and before their parentheses.
+* No spaces between parentheses and their contents.
 
 **For example:**
 ```objc
@@ -109,6 +119,24 @@ result = a > b ? x : y;
 result = a > b ? x = c > d ? c : d : y;
 ```
 
+## Blocks
+
+* Blocks should have a space between their return type and name.
+* Block definitions should omit their return type when possible.
+* Block definitions should omit their arguments if they are `void`.
+* Parameters in block types should be named unless the block is initialized immediately.
+
+```objc
+void (^blockName1)(void) = ^{
+    // do some things
+};
+
+id (^blockName2)(id) = ^ id (id args) {
+    // do some things
+};
+```
+
+
 ## Error handling
 
 When methods return an error parameter by reference, switch on the returned value, not the error variable.
@@ -134,12 +162,18 @@ Some of Apple’s APIs write garbage values to the error parameter (if non-NULL)
 
 ## Methods
 
-In method signatures, there should be a space after the scope (-/+ symbol). There should be a space between the method segments.
+In method signatures, there should be a space after the scope (-/+ symbol). There should be a space between the method segments. Don't use the words `and` or `with` to name more parameters.
 
-**For Example**:
+**For Example:**:
 ```objc
 - (void)setExampleText:(NSString *)text image:(UIImage *)image;
 ```
+
+**Not:**:
+```objc
+- (void)setExampleText:(NSString *)text andImage:(UIImage *)image;
+```
+
 ## Variables
 
 Variables should be named as descriptively as possible. Single letter variable names should be avoided except in `for()` loops.
@@ -241,11 +275,14 @@ Block comments should generally be avoided, as code should be as self-documentin
 
 `NSString`, `NSDictionary`, `NSArray`, and `NSNumber` literals should be used whenever creating immutable instances of those objects. Pay special care that `nil` values not be passed into `NSArray` and `NSDictionary` literals, as this will cause a crash.
 
+* The contents of array and dictionary literals should have a space on both sides.
+* Dictionary literals should have no space between the key and the colon, and a single space between colon and value.
+
 **For example:**
 
 ```objc
-NSArray *names = @[@"Brian", @"Matt", @"Chris", @"Alex", @"Steve", @"Paul"];
-NSDictionary *productManagers = @{@"iPhone" : @"Kate", @"iPad" : @"Kamal", @"Mobile Web" : @"Bill"};
+NSArray *names = @[ @"Brian", @"Matt", @"Chris", @"Alex", @"Steve", @"Paul" ];
+NSDictionary *productManagers = @{ @"iPhone": @"Kate", @"iPad": @"Kamal", @"Mobile Web": @"Bill" };
 NSNumber *shouldUseLiterals = @YES;
 NSNumber *buildingZIPCode = @10018;
 ```
@@ -414,6 +451,45 @@ This will prevent [possible and sometimes prolific crashes](http://cocoasamurai.
 The physical files should be kept in sync with the Xcode project files in order to avoid file sprawl. Any Xcode groups created should be reflected by folders in the filesystem. Code should be grouped not only by type, but also by feature for greater clarity.
 
 When possible, always turn on "Treat Warnings as Errors" in the target's Build Settings and enable as many [additional warnings](http://boredzo.org/blog/archives/2009-11-07/warnings) as possible. If you need to ignore a specific warning, use [Clang's pragma feature](http://clang.llvm.org/docs/UsersManual.html#controlling-diagnostics-via-pragmas).
+
+## Organization
+* Use `#pragma mark`s to categorize methods into functional groupings and protocol implementations, following this general structure:
+  - `#pragma mark - SECTION NAME`
+
+```objc
+#pragma mark - Properties
+
+@dynamic someProperty;
+
+- (void)setCustomProperty:(id)value {}
+
+#pragma mark - Lifecycle
+
++ (instancetype)objectWithThing:(id)thing {}
+- (instancetype)init {}
+
+#pragma mark - Drawing
+
+- (void)drawRect:(CGRect) {}
+
+#pragma mark - Another functional grouping
+
+#pragma mark - GHSuperclass
+
+- (void)someOverriddenMethod {}
+
+#pragma mark - NSCopying
+
+- (id)copyWithZone:(NSZone *)zone {}
+
+#pragma mark - NSObject
+
+- (NSString *)description {}
+```
+
+## Testing
+* If you need to expose private methods for subclasses or unit testing, create a class extension named `Class+Private`.
+
 
 # Other Objective-C Style Guides
 
