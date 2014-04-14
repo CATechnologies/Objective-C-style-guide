@@ -366,7 +366,7 @@ static const CGFloat NYTImageThumbnailHeight = 50.0;
 ### Constants location
 Constants location in code depends on the constant character:
 - If the constant has a **reusable character around the project** they must be in a constant header file
-- However if the constant has a private character and it only has sense in the class where it's going to be used, the constant has to be **added to that class header file.**
+- However if the constant has a private character and it only has sense in the class where it's going to be used, the constant has to be **added to the top of .m file**
 
 ## Enumerated Types
 
