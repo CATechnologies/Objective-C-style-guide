@@ -32,6 +32,7 @@ Here are some of the documents from Apple that informed the style guide. If some
 * [Booleans](#booleans)
 * [Singletons](#singletons)
 * [Xcode Project](#xcode-project)
+* [Xcode Project](#logs)
 
 ## Dot-Notation Syntax
 
@@ -134,6 +135,24 @@ void (^blockName1)(void) = ^{
 id (^blockName2)(id) = ^ id (id args) {
     // do some things
 };
+```
+
+* When a method requires blocks as input parameters, instead of passing nil parameter if you don't pretend to do nothing **pass an empty block**. 
+
+```objc
+// Bad way
+[[APIClient sharedInstance] PUT:[object urlForUpdateObject]
+                                 parameters:mutAttributes
+                 success:nil failure:nil];
+
+// Right way
+[[APIClient sharedInstance] PUT:[object urlForUpdateObject]
+                                 parameters:mutAttributes
+                 success:^(NSURLSessionDataTask *task, id responseObject) {
+                        // Notify the user
+                  } failure:^(NSURLSessionDataTask *task, NSError *error) {
+                      // Report the error
+                  }];
 ```
 
 
@@ -343,6 +362,11 @@ static const CGFloat NYTImageThumbnailHeight = 50.0;
 
 #define thumbnailHeight 2
 ```
+
+### Constants location
+Constants location in code depends on the constant character:
+- If the constant has a **reusable character around the project** they must be in a constant header file
+- However if the constant has a private character and it only has sense in the class where it's going to be used, the constant has to be **added to the top of .m file**
 
 ## Enumerated Types
 
